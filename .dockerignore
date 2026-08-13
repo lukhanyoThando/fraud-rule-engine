@@ -1,0 +1,10 @@
+**/bin/
+**/obj/
+.vs/
+.vscode/
+.git/
+.gitignore
+*.user
+*.suo
+README.md
+FRAUD_RULE_ENGINE_TUTORIAL.md

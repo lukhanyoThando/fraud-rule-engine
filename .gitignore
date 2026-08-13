@@ -1,0 +1,22 @@
+## Build output
+**/bin/
+**/obj/
+
+## Local database files
+**/data/
+*.db
+*.db-shm
+*.db-wal
+
+## User-specific files
+.vs/
+*.user
+*.suo
+
+## Docker and local environment files
+.env
+docker-compose.override.yml
+
+## OS files
+.DS_Store
+Thumbs.db
