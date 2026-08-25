@@ -2,7 +2,7 @@
 
 **Author:** Lukanyo Tando Nkohla
 
-A .NET 9 Web API that evaluates transactions against fraud rules, stores customer profiles and assessments in SQLite, and returns `Clear`, `Review`, or `Block` decisions.
+I created this project to model how a bank could assess transactions for fraud before processing them. It compares each transaction with the customer’s normal profile and previous activity, checking amount, location, merchant, device, transaction velocity, and repeated behavior. The rules generate a risk score that produces a Clear, Review, or Block decision. I built it with a layered .NET architecture, SQLite persistence, Docker support, and automated tests so it reflects both the business problem and the engineering practices needed in a banking environment.
 
 ## What This Project Demonstrates
 
