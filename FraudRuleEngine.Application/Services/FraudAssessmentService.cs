@@ -43,6 +43,9 @@ public sealed class FraudAssessmentService
             transaction.CustomerId,
             decision,
             totalScore,
-            matchedRules);
+            matchedRules,
+            transaction.Amount,
+            transaction.DeviceId,
+            transaction.Timestamp);
     }
 }

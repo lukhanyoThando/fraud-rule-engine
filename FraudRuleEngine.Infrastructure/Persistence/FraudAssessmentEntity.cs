@@ -9,4 +9,7 @@ public class FraudAssessmentEntity
     public int RiskScore { get; set; }
     public string MatchedRulesJson { get; set; } = string.Empty;
     public DateTimeOffset CreatedAt { get; set; }
+    public decimal Amount { get; set; }
+    public string DeviceId { get; set; } = string.Empty;
+    public DateTimeOffset TransactionTimestamp { get; set; }
 }

@@ -7,4 +7,5 @@ public class CustomerProfile
     public string PreferredMerchant { get; set; } = string.Empty;
     public int TransactionsLast24Hours { get; set; }
     public string LastKnownDeviceId { get; set; } = string.Empty;
+    public int MatchingTransactionsLast24Hours { get; set; }
 }

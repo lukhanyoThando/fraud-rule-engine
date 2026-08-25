@@ -23,7 +23,9 @@ ENV ASPNETCORE_ENVIRONMENT=Development
 ENV ASPNETCORE_URLS=http://+:8080
 EXPOSE 8080
 
-RUN mkdir -p /app/data
+RUN mkdir -p /app/data && chown -R $APP_UID:$APP_UID /app
 COPY --from=build /app/publish .
+
+USER $APP_UID
 
 ENTRYPOINT ["dotnet", "FraudRuleEngine.Api.dll"]

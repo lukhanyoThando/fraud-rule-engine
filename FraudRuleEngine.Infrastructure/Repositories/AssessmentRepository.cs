@@ -25,11 +25,86 @@ public sealed class AssessmentRepository : IAssessmentRepository
             Decision = assessment.Decision.ToString(),
             RiskScore = assessment.RiskScore,
             MatchedRulesJson = JsonSerializer.Serialize(assessment.MatchedRules),
-            CreatedAt = DateTimeOffset.UtcNow
+            CreatedAt = DateTimeOffset.UtcNow,
+            Amount = assessment.Amount,
+            DeviceId = assessment.DeviceId,
+            TransactionTimestamp = assessment.Timestamp
         };
 
         await context.FraudAssessments.AddAsync(entity, cancellationToken);
         await context.SaveChangesAsync(cancellationToken);
+    }
+
+    public Task<bool> ExistsAsync(string transactionId, CancellationToken cancellationToken = default) =>
+        context.FraudAssessments.AnyAsync(x => x.TransactionId == transactionId, cancellationToken);
+
+    public Task<int> CountCustomerTransactionsAsync(
+        string customerId,
+        DateTimeOffset timestamp,
+        CancellationToken cancellationToken = default)
+    {
+        var windowStart = timestamp.AddHours(-24);
+
+        return CountCustomerTransactionsAsync(
+            customerId,
+            timestamp,
+            windowStart,
+            cancellationToken);
+    }
+
+    private async Task<int> CountCustomerTransactionsAsync(
+        string customerId,
+        DateTimeOffset timestamp,
+        DateTimeOffset windowStart,
+        CancellationToken cancellationToken)
+    {
+        var timestamps = await context.FraudAssessments
+            .AsNoTracking()
+            .Where(x => x.CustomerId == customerId)
+            .Select(x => x.TransactionTimestamp)
+            .ToListAsync(cancellationToken);
+
+        return timestamps.Count(transactionTimestamp =>
+            transactionTimestamp >= windowStart && transactionTimestamp <= timestamp);
+    }
+
+    public Task<int> CountMatchingTransactionsAsync(
+        string customerId,
+        decimal amount,
+        string deviceId,
+        DateTimeOffset timestamp,
+        CancellationToken cancellationToken = default)
+    {
+        var windowStart = timestamp.AddHours(-24);
+
+        return CountMatchingTransactionsAsync(
+            customerId,
+            amount,
+            deviceId,
+            timestamp,
+            windowStart,
+            cancellationToken);
+    }
+
+    private async Task<int> CountMatchingTransactionsAsync(
+        string customerId,
+        decimal amount,
+        string deviceId,
+        DateTimeOffset timestamp,
+        DateTimeOffset windowStart,
+        CancellationToken cancellationToken)
+    {
+        var candidates = await context.FraudAssessments
+            .AsNoTracking()
+            .Where(x => x.CustomerId == customerId)
+            .Select(x => new { x.Amount, x.DeviceId, x.TransactionTimestamp })
+            .ToListAsync(cancellationToken);
+
+        return candidates.Count(candidate =>
+            candidate.Amount == amount
+                && string.Equals(candidate.DeviceId, deviceId, StringComparison.OrdinalIgnoreCase)
+                && candidate.TransactionTimestamp >= windowStart
+                && candidate.TransactionTimestamp <= timestamp);
     }
 
     public async Task<FraudAssessment?> GetByTransactionIdAsync(string transactionId, CancellationToken cancellationToken = default)
@@ -50,7 +125,10 @@ public sealed class AssessmentRepository : IAssessmentRepository
             entity.CustomerId,
             Enum.Parse<FraudDecision>(entity.Decision),
             entity.RiskScore,
-            matchedRules);
+            matchedRules,
+            entity.Amount,
+            entity.DeviceId,
+            entity.TransactionTimestamp);
     }
 
     public async Task<IReadOnlyList<FraudAssessment>> GetAllAsync(CancellationToken cancellationToken = default)
@@ -65,7 +143,10 @@ public sealed class AssessmentRepository : IAssessmentRepository
                 entity.CustomerId,
                 Enum.Parse<FraudDecision>(entity.Decision),
                 entity.RiskScore,
-                DeserializeMatchedRules(entity.MatchedRulesJson)))
+                DeserializeMatchedRules(entity.MatchedRulesJson),
+                entity.Amount,
+                entity.DeviceId,
+                entity.TransactionTimestamp))
             .ToList();
     }
 

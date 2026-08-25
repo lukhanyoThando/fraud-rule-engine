@@ -1,5 +1,11 @@
 **/bin/
 **/obj/
+**/data/
+.git/
+.vs/
+README.md
+TestResults/**/bin/
+**/obj/
 .vs/
 .vscode/
 .git/

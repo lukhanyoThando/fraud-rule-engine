@@ -24,6 +24,28 @@ public sealed class CustomerProfileRepository
             return null;
         }
 
+        return ToDomain(entity);
+    }
+
+    public Task<bool> ExistsAsync(string customerId, CancellationToken cancellationToken = default) =>
+        context.CustomerProfiles.AnyAsync(x => x.CustomerId == customerId, cancellationToken);
+
+    public async Task AddAsync(CustomerProfile profile, CancellationToken cancellationToken = default)
+    {
+        await context.CustomerProfiles.AddAsync(new CustomerProfileEntity
+        {
+            CustomerId = profile.CustomerId,
+            HomeCountry = profile.HomeCountry,
+            PreferredMerchant = profile.PreferredMerchant,
+            TransactionsLast24Hours = profile.TransactionsLast24Hours,
+            LastKnownDeviceId = profile.LastKnownDeviceId
+        }, cancellationToken);
+
+        await context.SaveChangesAsync(cancellationToken);
+    }
+
+    private static CustomerProfile ToDomain(CustomerProfileEntity entity)
+    {
         return new CustomerProfile
         {
             CustomerId = entity.CustomerId,

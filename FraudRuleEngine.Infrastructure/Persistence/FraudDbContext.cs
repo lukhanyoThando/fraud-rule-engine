@@ -19,6 +19,10 @@ public class FraudDbContext : DbContext
     {
         base.OnModelCreating(modelBuilder);
 
+        modelBuilder.Entity<CustomerProfileEntity>()
+            .HasIndex(x => x.CustomerId)
+            .IsUnique();
+
         modelBuilder.Entity<CustomerProfileEntity>().HasData(
             new CustomerProfileEntity
             {

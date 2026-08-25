@@ -1,0 +1,13 @@
+services:
+  fraud-rule-engine:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: fraud-rule-engine
+    environment:
+      ASPNETCORE_ENVIRONMENT: Development
+      ASPNETCORE_URLS: http://+:8080
+    ports:
+      - "8080:8080"
+    volumes:
+      - ./data:/app/data

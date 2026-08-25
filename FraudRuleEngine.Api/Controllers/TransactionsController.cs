@@ -29,28 +29,50 @@ public class TransactionsController : ControllerBase
     public async Task<ActionResult<FraudAssessmentResponse>> Evaluate(
         TransactionRequest request)
     {
+        var transactionId = string.IsNullOrWhiteSpace(request.TransactionId)
+            ? $"tx-{Guid.NewGuid():N}"
+            : request.TransactionId;
+
+        if (await repository.ExistsAsync(transactionId))
+        {
+            return Conflict($"Transaction '{transactionId}' has already been evaluated.");
+        }
+
+        var customer = await customerProfileRepository.GetByCustomerIdAsync(
+            request.CustomerId,
+            HttpContext.RequestAborted);
+
+        if (customer is null)
+        {
+            return NotFound($"Customer '{request.CustomerId}' is not registered.");
+        }
+
         var transaction = new TransactionEvent
         {
-            TransactionId = request.TransactionId,
+            TransactionId = transactionId,
             CustomerId = request.CustomerId,
             Amount = request.Amount,
             Currency = request.Currency,
-            Merchant = request.Merchant,
+            Merchant = string.IsNullOrWhiteSpace(request.Merchant)
+                ? customer.PreferredMerchant
+                : request.Merchant,
             Country = request.Country,
-            Timestamp = request.Timestamp,
+            Timestamp = DateTimeOffset.UtcNow,
             Category = request.Category,
             DeviceId = request.DeviceId
         };
 
-        var customer = await customerProfileRepository.GetByCustomerIdAsync(request.CustomerId)
-            ?? new CustomerProfile
-            {
-                CustomerId = request.CustomerId,
-                HomeCountry = "GB",
-                PreferredMerchant = "Tesco",
-                TransactionsLast24Hours = 3,
-                LastKnownDeviceId = "device-1"
-            };
+        customer.TransactionsLast24Hours =
+            await repository.CountCustomerTransactionsAsync(
+                transaction.CustomerId,
+                transaction.Timestamp);
+
+        customer.MatchingTransactionsLast24Hours =
+            await repository.CountMatchingTransactionsAsync(
+                transaction.CustomerId,
+                transaction.Amount,
+                transaction.DeviceId,
+                transaction.Timestamp);
 
         var result = service.Evaluate(transaction, customer);
         await repository.AddAsync(result);
