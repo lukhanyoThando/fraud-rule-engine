@@ -600,7 +600,7 @@ Register the customer first with `POST /api/customers`. The evaluation endpoint 
 
 If you explicitly send a transaction ID that already exists, the API returns `409 Conflict`. Omit the field to let the server generate a new ID.
 
-## Interview Summary
+##Summary
 
 This application receives a transaction, identifies the customer's stored baseline using `customerId`, checks the transaction against six independently registered rules, calculates a total score, persists the assessment, and returns a decision.
 
