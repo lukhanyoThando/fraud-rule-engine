@@ -27,9 +27,9 @@ public class FraudDbContext : DbContext
             new CustomerProfileEntity
             {
                 Id = 1,
-                CustomerId = "cust-velocity-001",
-                HomeCountry = "GB",
-                PreferredMerchant = "Tesco",
+                CustomerId = "cust-001",
+                HomeCountry = "ZA",
+                PreferredMerchant = "spar",
                 TransactionsLast24Hours = 8,
                 LastKnownDeviceId = "device-9"
             });

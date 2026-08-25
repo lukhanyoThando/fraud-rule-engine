@@ -197,10 +197,10 @@ public class FraudAssessmentServiceTests
         await using (var context = new FraudDbContext(options))
         {
             var repository = new CustomerProfileRepository(context);
-            var profile = await repository.GetByCustomerIdAsync("cust-velocity-001");
+            var profile = await repository.GetByCustomerIdAsync("cust-001");
 
             Assert.NotNull(profile);
-            Assert.Equal("GB", profile!.HomeCountry);
+            Assert.Equal("ZA", profile!.HomeCountry);
             Assert.Equal(8, profile.TransactionsLast24Hours);
             Assert.Equal("device-9", profile.LastKnownDeviceId);
         }

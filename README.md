@@ -90,9 +90,9 @@ Stores the baseline behavior for each customer:
 The application seeds one customer:
 
 ```text
-CustomerId:              cust-velocity-001
-HomeCountry:             GB
-PreferredMerchant:       Tesco
+CustomerId:              cust-001
+HomeCountry:             ZA
+PreferredMerchant:       spar
 TransactionsLast24Hours: 8
 LastKnownDeviceId:       device-9
 ```
